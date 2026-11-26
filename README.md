@@ -7,9 +7,10 @@ Backend API untuk proyek akhir mata kuliah **Pengembangan Aplikasi Web II (PAW I
 - **Repository GitHub:** https://github.com/Ridzz05/PAW-II-Project
 - **Product Requirements Document (PRD):** `docs/PRD.md`
 - **Laporan Progres Backend:** `docs/LAPORAN-BACKEND.md`
+- **Panduan Database & Deployment:** `docs/DATABASE_DEPLOYMENT.md`
 - **Postman Collection:** `postman/Cinoverse-API.postman_collection.json`
 
-## Kelompok 3 (SI5B — Universitas MDP)
+## Kelompok 3 PAW 2 (SI5B — Universitas MDP)
 | No | Nama | NIM | Peran |
 |---:|---|---|---|
 | 1 | M. Rizki Algipari | 2428240069 | Ketua / Backend Developer |
