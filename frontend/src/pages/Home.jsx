@@ -15,12 +15,7 @@ export default function Home() {
         setLoading(true);
         setError("");
 
-        const response = await api.get("/movies", {
-          params: {
-            status: "now_showing",
-            limit: 4,
-          },
-        });
+        const response = await api.get("/movies?status=now_showing");
 
         setMovies(response.data.data || []);
       } catch (err) {
