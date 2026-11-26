@@ -1,29 +1,33 @@
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
+import AdminLayout from "./layouts/AdminLayout";
 
 import Home from "./pages/Home";
 import Movies from "./pages/Movies";
 import MovieDetail from "./pages/MovieDetail";
 import Cinemas from "./pages/Cinemas";
 import Showtimes from "./pages/Showtimes";
-import AdminMovies from "./pages/admin/AdminMovies";
-import AdminCinemas from "./pages/admin/AdminCinemas";
-import AdminShowtimes from "./pages/admin/AdminShowtimes";
-import AdminBookings from "./pages/admin/AdminBookings";
 import Booking from "./pages/Booking";
+import MyTickets from "./pages/MyTickets";
 
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 
-// Admin
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminMovies from "./pages/admin/AdminMovies";
+import AdminCinemas from "./pages/admin/AdminCinemas";
+import AdminShowtimes from "./pages/admin/AdminShowtimes";
+import AdminBookings from "./pages/admin/AdminBookings";
 
 function App() {
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith("/admin");
+
   return (
     <>
-      <Navbar />
+      {!isAdminPage && <Navbar />}
 
       <Routes>
         {/* USER */}
@@ -33,17 +37,20 @@ function App() {
         <Route path="/cinemas" element={<Cinemas />} />
         <Route path="/showtimes" element={<Showtimes />} />
         <Route path="/booking/:showtimeId" element={<Booking />} />
-        
+        <Route path="/riwayat" element={<MyTickets />} />
+
         {/* AUTH */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        
+
         {/* ADMIN */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/movies" element={<AdminMovies />} />
-        <Route path="/admin/cinemas" element={<AdminCinemas />} />
-        <Route path="/admin/showtimes" element={<AdminShowtimes />} />
-        <Route path="/admin/bookings" element={<AdminBookings />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="movies" element={<AdminMovies />} />
+          <Route path="cinemas" element={<AdminCinemas />} />
+          <Route path="showtimes" element={<AdminShowtimes />} />
+          <Route path="bookings" element={<AdminBookings />} />
+        </Route>
       </Routes>
     </>
   );

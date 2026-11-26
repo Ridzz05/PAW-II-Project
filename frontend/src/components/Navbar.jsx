@@ -1,77 +1,99 @@
 
-import { Link } from "react-router-dom";
-import { Film, Ticket, User } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Film, Ticket, User, LogOut } from "lucide-react";
 
 export default function Navbar() {
-  return (
-    <nav className="navbar navbar-expand-lg cinema-navbar">
-      <div className="container">
-        <Link className="navbar-brand cinema-brand" to="/">
-          <Film size={27} />
-          <span>
-            CINO<span className="brand-highlight">VERSE</span>
-          </span>
-        </Link>
+    const navigate = useNavigate();
 
-        <button
-          className="navbar-toggler bg-light"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarContent"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "null");
 
-        <div
-          className="collapse navbar-collapse"
-          id="navbarContent"
-        >
-          <ul className="navbar-nav mx-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">
-                Home
-              </Link>
-            </li>
+    const isLoggedIn = Boolean(token);
 
-            <li className="nav-item">
-              <Link className="nav-link" to="/movies">
-                Movies
-              </Link>
-            </li>
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
 
-            <li className="nav-item">
-              <Link className="nav-link" to="/cinemas">
-                Cinemas
-              </Link>
-            </li>
+        navigate("/login");
+        window.location.reload();
+    };
 
-            {/* MENU SHOWTIMES */}
-            <li className="nav-item">
-              <Link className="nav-link" to="/showtimes">
-                Showtimes
-              </Link>
-            </li>
+    return (
+        <nav className="navbar navbar-expand-lg cinema-navbar">
+            <div className="container">
+                <Link className="navbar-brand cinema-brand" to="/">
+                    <Film size={27} />
+                    <span>
+                        CINO<span className="brand-highlight">VERSE</span>
+                    </span>
+                </Link>
 
-            <li className="nav-item">
-              <Link className="nav-link" to="/riwayat">
-                My Tickets
-              </Link>
-            </li>
-          </ul>
+                <button
+                    className="navbar-toggler bg-light"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarContent"
+                >
+                    <span className="navbar-toggler-icon"></span>
+                </button>
 
-          <div className="d-flex gap-2">
-            <Link to="/login" className="btn btn-outline-light">
-              <User size={17} className="me-1" />
-              Login
-            </Link>
+                <div
+                    className="collapse navbar-collapse"
+                    id="navbarContent"
+                >
+                    <ul className="navbar-nav mx-auto">
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/">Home</Link>
+                        </li>
 
-            <Link to="/register" className="btn btn-cinema">
-              <Ticket size={17} className="me-1" />
-              Register
-            </Link>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/movies">Movies</Link>
+                        </li>
+
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/cinemas">Cinemas</Link>
+                        </li>
+
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/showtimes">
+                                Showtimes
+                            </Link>
+                        </li>
+
+                        {isLoggedIn && user?.role !== "admin" && (
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/riwayat">
+                                    My Tickets
+                                </Link>
+                            </li>
+                        )}
+                    </ul>
+
+                    <div className="d-flex gap-2">
+                        {isLoggedIn ? (
+                            <button
+                                onClick={handleLogout}
+                                className="btn btn-outline-light"
+                            >
+                                <LogOut size={17} className="me-1" />
+                                Logout
+                            </button>
+                        ) : (
+                            <>
+                                <Link to="/login" className="btn btn-outline-light">
+                                    <User size={17} className="me-1" />
+                                    Login
+                                </Link>
+
+                                <Link to="/register" className="btn btn-cinema">
+                                    <Ticket size={17} className="me-1" />
+                                    Register
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </nav>
+    );
 }
