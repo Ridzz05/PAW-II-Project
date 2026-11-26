@@ -23,8 +23,11 @@ async function connectDB() {
       });
   }
 
-  global._mongooseCache.conn = await global._mongooseCache.promise;
-  return global._mongooseCache.conn;
+ global._mongooseCache.conn = await global._mongooseCache.promise;
+
+console.log("MongoDB berhasil terhubung!");
+
+return global._mongooseCache.conn;
 }
 
 module.exports = { connectDB };
