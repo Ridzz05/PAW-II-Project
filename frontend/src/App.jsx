@@ -23,11 +23,16 @@ import AdminBookings from "./pages/admin/AdminBookings";
 
 function App() {
   const location = useLocation();
-  const isAdminPage = location.pathname.startsWith("/admin");
+
+  // Sembunyikan Navbar pada halaman Login, Register, dan Admin
+  const hideNavbar =
+    location.pathname === "/login" ||
+    location.pathname === "/register" ||
+    location.pathname.startsWith("/admin");
 
   return (
     <>
-      {!isAdminPage && <Navbar />}
+      {!hideNavbar && <Navbar />}
 
       <Routes>
         {/* USER */}
