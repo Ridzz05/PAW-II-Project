@@ -2,16 +2,24 @@
   "info": {
     "name": "CINOVERSE Backend API (Kelompok 3 - PAW II)",
     "_postman_id": "a1b2c3d4-5678-4000-9000-cinoverse0003",
-    "description": "Postman Collection untuk pengujian RESTful API CINOVERSE (Auth JWT, Movies, Cinemas, Showtimes, Bookings & E-Ticket).",
+    "description": "Postman Collection dengan automated test scripts (Sub-CPMK-7) untuk pengujian RESTful API CINOVERSE (Auth JWT, Movies, Cinemas, Showtimes, Bookings & E-Ticket).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000" },
     { "key": "token", "value": "" },
+    { "key": "userToken", "value": "" },
+    { "key": "adminToken", "value": "" },
     { "key": "movieId", "value": "" },
+    { "key": "createdMovieId", "value": "" },
     { "key": "cinemaId", "value": "" },
+    { "key": "createdCinemaId", "value": "" },
     { "key": "showtimeId", "value": "" },
-    { "key": "bookingId", "value": "" }
+    { "key": "createdShowtimeId", "value": "" },
+    { "key": "bookingId", "value": "" },
+    { "key": "cancelBookingId", "value": "" },
+    { "key": "dynamicSeat", "value": "B1" },
+    { "key": "dynamicCancelSeat", "value": "C1" }
   ],
   "item": [
     {
@@ -19,6 +27,25 @@
       "item": [
         {
           "name": "GET / (API Info)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is valid JSON with success true', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.app).to.eql('CINOVERSE Backend API');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/"
@@ -36,8 +63,17 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const json = pm.response.json();",
-                  "if (json.token) pm.collectionVariables.set('token', json.token);"
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response contains JWT token and user data', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.token).to.be.a('string').and.not.be.empty;",
+                  "    pm.expect(json.data.role).to.eql('user');",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -48,7 +84,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Penonton Baru\",\n  \"email\": \"penonton@cinoverse.id\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"name\": \"Penonton Baru\",\n  \"email\": \"penonton.{{$timestamp}}@cinoverse.id\",\n  \"password\": \"password123\"\n}"
             },
             "url": "{{baseUrl}}/api/auth/register"
           }
@@ -60,8 +96,18 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const json = pm.response.json();",
-                  "if (json.token) pm.collectionVariables.set('token', json.token);"
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Login returns JWT token for user', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.token).to.be.a('string').and.not.be.empty;",
+                  "    pm.expect(json.data.email).to.eql('budi@email.com');",
+                  "    pm.collectionVariables.set('userToken', json.token);",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -78,14 +124,52 @@
           }
         },
         {
+          "name": "Get Profile (/api/auth/me)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Profile matches logged-in user without password', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.email).to.eql('budi@email.com');",
+                  "    pm.expect(json.data.password).to.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        },
+        {
           "name": "Login Admin",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "const json = pm.response.json();",
-                  "if (json.token) pm.collectionVariables.set('token', json.token);"
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Login returns JWT token for admin', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.token).to.be.a('string').and.not.be.empty;",
+                  "    pm.expect(json.data.role).to.eql('admin');",
+                  "    pm.collectionVariables.set('adminToken', json.token);",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -100,14 +184,6 @@
             },
             "url": "{{baseUrl}}/api/auth/login"
           }
-        },
-        {
-          "name": "Get Profile (/api/auth/me)",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": "{{baseUrl}}/api/auth/me"
-          }
         }
       ]
     },
@@ -121,8 +197,16 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const json = pm.response.json();",
-                  "if (json.data && json.data.length > 0) pm.collectionVariables.set('movieId', json.data[0]._id);"
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns movies array', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data).to.be.an('array').and.not.be.empty;",
+                  "    pm.collectionVariables.set('movieId', json.data[0]._id);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -135,6 +219,25 @@
         },
         {
           "name": "Get Movie By ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns movie detail object', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data._id).to.eql(pm.collectionVariables.get('movieId'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/movies/{{movieId}}"
@@ -147,8 +250,16 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const json = pm.response.json();",
-                  "if (json.data && json.data._id) pm.collectionVariables.set('movieId', json.data._id);"
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Created movie returned in JSON', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.title).to.eql('Avatar: Fire and Ash');",
+                  "    pm.collectionVariables.set('createdMovieId', json.data._id);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -158,7 +269,7 @@
             "method": "POST",
             "header": [
               { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
             ],
             "body": {
               "mode": "raw",
@@ -169,25 +280,62 @@
         },
         {
           "name": "Update Movie (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Movie rating updated to 8.8', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.rating).to.eql(8.8);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
               { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
             ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"rating\": 8.8\n}"
             },
-            "url": "{{baseUrl}}/api/movies/{{movieId}}"
+            "url": "{{baseUrl}}/api/movies/{{createdMovieId}}"
           }
         },
         {
           "name": "Delete Movie (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Movie deleted successfully', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": "{{baseUrl}}/api/movies/{{movieId}}"
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/api/movies/{{createdMovieId}}"
           }
         }
       ]
@@ -202,8 +350,16 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const json = pm.response.json();",
-                  "if (json.data && json.data.length > 0) pm.collectionVariables.set('cinemaId', json.data[0]._id);"
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns cinemas array', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data).to.be.an('array').and.not.be.empty;",
+                  "    pm.collectionVariables.set('cinemaId', json.data[0]._id);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -216,6 +372,25 @@
         },
         {
           "name": "Get Cinema By ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns cinema detail with embedded studios', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.studios).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/cinemas/{{cinemaId}}"
@@ -228,8 +403,16 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const json = pm.response.json();",
-                  "if (json.data && json.data._id) pm.collectionVariables.set('cinemaId', json.data._id);"
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Created cinema returned in JSON', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.name).to.eql('Cinoverse Square');",
+                  "    pm.collectionVariables.set('createdCinemaId', json.data._id);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -239,7 +422,7 @@
             "method": "POST",
             "header": [
               { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
             ],
             "body": {
               "mode": "raw",
@@ -250,25 +433,62 @@
         },
         {
           "name": "Update Cinema (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Cinema address updated', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.address).to.eql('Jl. Angkatan 45 No. 99, Palembang');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
               { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
             ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"address\": \"Jl. Angkatan 45 No. 99, Palembang\"\n}"
             },
-            "url": "{{baseUrl}}/api/cinemas/{{cinemaId}}"
+            "url": "{{baseUrl}}/api/cinemas/{{createdCinemaId}}"
           }
         },
         {
           "name": "Delete Cinema (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Cinema deleted successfully', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": "{{baseUrl}}/api/cinemas/{{cinemaId}}"
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/api/cinemas/{{createdCinemaId}}"
           }
         }
       ]
@@ -283,8 +503,18 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const json = pm.response.json();",
-                  "if (json.data && json.data.length > 0) pm.collectionVariables.set('showtimeId', json.data[0]._id);"
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns showtimes array with populated movie & cinema', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data).to.be.an('array').and.not.be.empty;",
+                  "    pm.expect(json.data[0].movieId).to.be.an('object');",
+                  "    pm.expect(json.data[0].cinemaId).to.be.an('object');",
+                  "    pm.collectionVariables.set('showtimeId', json.data[0]._id);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -297,6 +527,25 @@
         },
         {
           "name": "Get Showtime By ID (Seat Map)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns showtime with bookedSeats array', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.bookedSeats).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/showtimes/{{showtimeId}}"
@@ -309,8 +558,16 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const json = pm.response.json();",
-                  "if (json.data && json.data._id) pm.collectionVariables.set('showtimeId', json.data._id);"
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Created showtime returned in JSON', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.price).to.eql(50000);",
+                  "    pm.collectionVariables.set('createdShowtimeId', json.data._id);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -320,7 +577,7 @@
             "method": "POST",
             "header": [
               { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
             ],
             "body": {
               "mode": "raw",
@@ -331,25 +588,62 @@
         },
         {
           "name": "Update Showtime (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Showtime price updated to 55000', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.price).to.eql(55000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
               { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
             ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"price\": 55000\n}"
             },
-            "url": "{{baseUrl}}/api/showtimes/{{showtimeId}}"
+            "url": "{{baseUrl}}/api/showtimes/{{createdShowtimeId}}"
           }
         },
         {
           "name": "Delete Showtime (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Showtime deleted successfully', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": "{{baseUrl}}/api/showtimes/{{showtimeId}}"
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/api/showtimes/{{createdShowtimeId}}"
           }
         }
       ]
@@ -358,14 +652,33 @@
       "name": "06 - Bookings & E-Ticket",
       "item": [
         {
-          "name": "Create Booking (Auth)",
+          "name": "Create Booking (Pay Flow)",
           "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const suffix = String(Date.now()).slice(-4);",
+                  "pm.collectionVariables.set('dynamicSeat', 'T' + suffix);"
+                ],
+                "type": "text/javascript"
+              }
+            },
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "const json = pm.response.json();",
-                  "if (json.data && json.data._id) pm.collectionVariables.set('bookingId', json.data._id);"
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Booking created with pending status and CNV code', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.bookingCode).to.match(/^CNV-/);",
+                  "    pm.expect(json.data.paymentStatus).to.eql('pending');",
+                  "    pm.collectionVariables.set('bookingId', json.data._id);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -375,22 +688,42 @@
             "method": "POST",
             "header": [
               { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"showtimeId\": \"{{showtimeId}}\",\n  \"seats\": [\"B1\", \"B2\"],\n  \"paymentMethod\": \"virtual_account\"\n}"
+              "raw": "{\n  \"showtimeId\": \"{{showtimeId}}\",\n  \"seats\": [\"{{dynamicSeat}}\"],\n  \"paymentMethod\": \"virtual_account\"\n}"
             },
             "url": "{{baseUrl}}/api/bookings"
           }
         },
         {
           "name": "Pay Booking / Simulasi Pembayaran (Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Payment status changes to paid with paidAt timestamp', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.paymentStatus).to.eql('paid');",
+                  "    pm.expect(json.data.paidAt).to.not.be.null;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
               { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
             ],
             "body": {
               "mode": "raw",
@@ -401,34 +734,156 @@
         },
         {
           "name": "Get My Bookings / Riwayat (Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns user booking history array', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data).to.be.an('array').and.not.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
             "url": "{{baseUrl}}/api/bookings/me"
           }
         },
         {
           "name": "Get Booking Detail / E-Ticket (Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns E-Ticket detail matching bookingId', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data._id).to.eql(pm.collectionVariables.get('bookingId'));",
+                  "    pm.expect(json.data.bookingCode).to.match(/^CNV-/);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
             "url": "{{baseUrl}}/api/bookings/{{bookingId}}"
           }
         },
         {
           "name": "Get All Bookings (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Admin retrieves all bookings array', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data).to.be.an('array').and.not.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/api/bookings"
+          }
+        },
+        {
+          "name": "Create Booking (Cancel Flow)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const suffix = String(Date.now()).slice(-4);",
+                  "pm.collectionVariables.set('dynamicCancelSeat', 'C' + suffix);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Pending booking created for cancel test', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.paymentStatus).to.eql('pending');",
+                  "    pm.collectionVariables.set('cancelBookingId', json.data._id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"showtimeId\": \"{{showtimeId}}\",\n  \"seats\": [\"{{dynamicCancelSeat}}\"],\n  \"paymentMethod\": \"virtual_account\"\n}"
+            },
             "url": "{{baseUrl}}/api/bookings"
           }
         },
         {
           "name": "Cancel Booking (Auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Booking cancelled and seats released', function () {",
+                  "    pm.response.to.be.json;",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.paymentStatus).to.eql('cancelled');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
-            "url": "{{baseUrl}}/api/bookings/{{bookingId}}/cancel"
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+            "url": "{{baseUrl}}/api/bookings/{{cancelBookingId}}/cancel"
           }
         }
       ]
