@@ -949,3 +949,135 @@ a {
   }
 }
 
+
+/* BOOKING PAGE */
+.booking-page {
+  min-height: 80vh;
+}
+
+.booking-summary-card,
+.booking-seat-card {
+  background: #211936;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+}
+
+.screen-area {
+  text-align: center;
+  color: #aaa;
+  margin: 20px auto 35px;
+  max-width: 500px;
+  letter-spacing: 5px;
+  font-size: 12px;
+}
+
+.screen-line {
+  height: 7px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #b9a4ff,
+    transparent
+  );
+  border-radius: 50%;
+  box-shadow: 0 5px 20px rgba(185, 164, 255, 0.4);
+  margin-bottom: 12px;
+}
+
+.seat-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 25px;
+  margin-bottom: 30px;
+  color: #ddd;
+  font-size: 13px;
+}
+
+.seat-legend span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seat-sample {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+}
+
+.seat-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(43px, 1fr)
+  );
+  gap: 10px;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.seat-button {
+  min-height: 52px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  transition: 0.2s;
+}
+
+.seat-button small {
+  font-size: 10px;
+}
+
+.seat-button.available,
+.seat-sample.available {
+  background: #343044;
+  color: #fff;
+  border-color: #665b80;
+}
+
+.seat-button.available:hover {
+  background: #51446d;
+  transform: translateY(-2px);
+}
+
+.seat-button.selected,
+.seat-sample.selected {
+  background: #8b5cf6;
+  color: #fff;
+  border-color: #a78bfa;
+}
+
+.seat-button.booked,
+.seat-sample.booked {
+  background: #555;
+  color: #999;
+  border-color: #666;
+  cursor: not-allowed;
+}
+
+@media (max-width: 576px) {
+  .seat-grid {
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(35px, 1fr)
+    );
+    gap: 6px;
+  }
+
+  .seat-button {
+    min-height: 44px;
+  }
+
+  .seat-legend {
+    gap: 12px;
+    font-size: 11px;
+  }
+}
+
