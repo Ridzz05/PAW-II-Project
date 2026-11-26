@@ -1,0 +1,32 @@
+{
+  "name": "cinoverse-backend",
+  "version": "1.0.0",
+  "description": "Backend RESTful API CINOVERSE - Sistem Pemesanan Tiket Bioskop Secara Online (PAW II Kelompok 3 SI5B)",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "seed": "node scripts/seed.js"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "mongoose",
+    "jwt",
+    "cinoverse",
+    "paw2"
+  ],
+  "author": "Kelompok 3 SI5B - Universitas MDP",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.24.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
