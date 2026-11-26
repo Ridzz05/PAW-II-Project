@@ -76,7 +76,7 @@ function AdminBookings() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "Gagal mengambil data pemesanan tiket."
+        "Gagal mengambil data pemesanan tiket."
       );
     } finally {
       setLoading(false);
@@ -105,7 +105,7 @@ function AdminBookings() {
 
       const matchesStatus =
         statusFilter === "all" ||
-        booking.status === statusFilter;
+        booking.paymentStatus === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
@@ -158,7 +158,7 @@ function AdminBookings() {
           <div className="booking-stat-card">
             <p>Menunggu Pembayaran</p>
             <h3>
-              {bookings.filter((item) => item.status === "pending").length}
+              {bookings.filter((item) => item.paymentStatus === "pending").length}
             </h3>
           </div>
         </div>
@@ -167,7 +167,7 @@ function AdminBookings() {
           <div className="booking-stat-card">
             <p>Pemesanan Lunas</p>
             <h3>
-              {bookings.filter((item) => item.status === "paid").length}
+              {bookings.filter((item) => item.paymentStatus === "paid").length}
             </h3>
           </div>
         </div>
@@ -254,10 +254,10 @@ function AdminBookings() {
                       <td>
                         <span
                           className={`badge ${getStatusClass(
-                            booking.status
+                            booking.paymentStatus
                           )}`}
                         >
-                          {getStatusLabel(booking.status)}
+                          {getStatusLabel(booking.paymentStatus)}
                         </span>
                       </td>
 
@@ -389,10 +389,10 @@ function AdminBookings() {
                     <span>Status</span>
                     <span
                       className={`badge ${getStatusClass(
-                        selectedBooking.status
+                        selectedBooking.paymentStatus
                       )}`}
                     >
-                      {getStatusLabel(selectedBooking.status)}
+                      {getStatusLabel(selectedBooking.paymentStatus)}
                     </span>
                   </div>
                 </>

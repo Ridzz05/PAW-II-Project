@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Ticket,
   CalendarDays,
@@ -8,6 +8,7 @@ import {
   MapPin,
   Armchair,
   RefreshCw,
+  CreditCard,
 } from "lucide-react";
 import api from "../services/api";
 
@@ -15,6 +16,8 @@ export default function MyTickets() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   const fetchBookings = async () => {
     try {
@@ -36,6 +39,29 @@ export default function MyTickets() {
   useEffect(() => {
     fetchBookings();
   }, []);
+
+  // Melanjutkan pembayaran dari booking yang sudah dibuat
+  const handleContinuePayment = (booking) => {
+    const showtimeId = booking.showtimeId?._id;
+
+    if (!showtimeId) {
+      setError(
+        "Jadwal tayang tidak ditemukan. Silakan hubungi administrator."
+      );
+      return;
+    }
+
+    navigate(`/booking/${showtimeId}`, {
+      state: {
+        bookingId: booking._id,
+        bookingCode: booking.bookingCode,
+        seats: booking.seats,
+        totalPrice: booking.totalPrice,
+        paymentMethod: booking.paymentMethod,
+        continuePayment: true,
+      },
+    });
+  };
 
   const formatPrice = (price) =>
     new Intl.NumberFormat("id-ID", {
@@ -64,11 +90,13 @@ export default function MyTickets() {
           label: "Lunas",
           className: "ticket-status-paid",
         };
+
       case "cancelled":
         return {
           label: "Dibatalkan",
           className: "ticket-status-cancelled",
         };
+
       default:
         return {
           label: "Menunggu Pembayaran",
@@ -90,7 +118,11 @@ export default function MyTickets() {
       <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
           <span className="section-label">YOUR TICKETS</span>
-          <h1 className="text-white mt-2">Riwayat Tiket</h1>
+
+          <h1 className="text-white mt-2">
+            Riwayat Tiket
+          </h1>
+
           <p className="text-secondary mb-0">
             Lihat semua pemesanan tiket film kamu di CINOVERSE.
           </p>
@@ -108,6 +140,7 @@ export default function MyTickets() {
       {error && (
         <div className="alert alert-danger">
           {error}
+
           <button
             className="btn btn-sm btn-outline-danger ms-3"
             onClick={fetchBookings}
@@ -120,14 +153,23 @@ export default function MyTickets() {
       {!error && bookings.length === 0 && (
         <div className="card booking-summary-card text-center">
           <div className="card-body py-5">
-            <Ticket size={48} className="text-secondary mb-3" />
+            <Ticket
+              size={48}
+              className="text-secondary mb-3"
+            />
+
             <h4 className="text-white">
               Belum Ada Tiket
             </h4>
+
             <p className="text-secondary">
               Kamu belum melakukan pemesanan tiket film.
             </p>
-            <Link to="/movies" className="btn btn-cinema mt-2">
+
+            <Link
+              to="/movies"
+              className="btn btn-cinema mt-2"
+            >
               Jelajahi Film
             </Link>
           </div>
@@ -150,15 +192,19 @@ export default function MyTickets() {
                       <span className="section-label">
                         CINOVERSE E-TICKET
                       </span>
+
                       <h4 className="text-white mt-2 mb-1">
                         {movie?.title || "Film tidak tersedia"}
                       </h4>
+
                       <small className="text-secondary">
                         Kode Booking: {booking.bookingCode}
                       </small>
                     </div>
 
-                    <span className={`ticket-status ${status.className}`}>
+                    <span
+                      className={`ticket-status ${status.className}`}
+                    >
                       {status.label}
                     </span>
                   </div>
@@ -171,10 +217,12 @@ export default function MyTickets() {
                         <MapPin size={15} className="me-2" />
                         Bioskop
                       </p>
+
                       <p className="text-white mb-0">
                         {cinema?.name || "-"}
                         {cinema?.city ? ` - ${cinema.city}` : ""}
                       </p>
+
                       <small className="text-secondary">
                         {cinema?.address || ""}
                       </small>
@@ -185,6 +233,7 @@ export default function MyTickets() {
                         <CalendarDays size={15} className="me-2" />
                         Tanggal
                       </p>
+
                       <p className="text-white mb-0">
                         {formatDate(showtime?.date)}
                       </p>
@@ -195,6 +244,7 @@ export default function MyTickets() {
                         <Clock size={15} className="me-2" />
                         Waktu
                       </p>
+
                       <p className="text-white mb-0">
                         {showtime?.time || "-"}
                       </p>
@@ -205,6 +255,7 @@ export default function MyTickets() {
                         <Armchair size={15} className="me-2" />
                         Studio
                       </p>
+
                       <p className="text-white mb-0">
                         {showtime?.studioName || "-"}
                         {showtime?.studioType
@@ -217,6 +268,7 @@ export default function MyTickets() {
                       <p className="text-secondary mb-1">
                         Kursi
                       </p>
+
                       <p className="text-white mb-0">
                         {booking.seats?.join(", ") || "-"}
                       </p>
@@ -226,6 +278,7 @@ export default function MyTickets() {
                       <p className="text-secondary mb-1">
                         Metode Pembayaran
                       </p>
+
                       <p className="text-white mb-0">
                         {booking.paymentMethod || "-"}
                       </p>
@@ -234,19 +287,49 @@ export default function MyTickets() {
 
                   <hr className="border-secondary" />
 
-                  <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div>
                       <small className="text-secondary">
                         Total Pembayaran
                       </small>
+
                       <h4 className="text-white mb-0">
                         {formatPrice(booking.totalPrice)}
                       </h4>
                     </div>
 
                     {booking.paymentStatus === "pending" && (
-                      <span className="text-warning small">
-                        Menunggu proses pembayaran
+                      <div className="text-end">
+                        <p className="text-warning small mb-2">
+                          Menunggu proses pembayaran
+                        </p>
+
+                        <button
+                          type="button"
+                          className="btn btn-cinema"
+                          onClick={() =>
+                            handleContinuePayment(booking)
+                          }
+                        >
+                          <CreditCard
+                            size={17}
+                            className="me-2"
+                          />
+                          Lanjutkan Pembayaran
+                        </button>
+                      </div>
+                    )}
+
+                    {booking.paymentStatus === "paid" && (
+                      <span className="text-success small">
+                        <Ticket size={16} className="me-1" />
+                        Pembayaran berhasil
+                      </span>
+                    )}
+
+                    {booking.paymentStatus === "cancelled" && (
+                      <span className="text-danger small">
+                        Pemesanan telah dibatalkan
                       </span>
                     )}
                   </div>
