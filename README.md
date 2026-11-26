@@ -2,7 +2,7 @@
 
 Backend API untuk proyek akhir mata kuliah **Pengembangan Aplikasi Web II (PAW II)** — Sistem Pemesanan Tiket Bioskop Secara Online.
 
-## Kelompok 3 PAW2 (SI5B — Universitas MDP)
+## Kelompok 3 PAW 2 (SI5B — Universitas MDP)
 | No | Nama | NIM | Peran |
 |---:|---|---|---|
 | 1 | M. Rizki Algipari | 2428240069 | Ketua / Backend Developer |
