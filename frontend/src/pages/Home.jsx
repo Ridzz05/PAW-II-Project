@@ -1,49 +1,44 @@
 
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import MovieCard from "../components/MovieCard";
-
-const movies = [
-  {
-    id: "1",
-    title: "Avengers: Endgame",
-    genre: "Action / Adventure",
-    rating: "8.4",
-    duration: 181,
-    status: "Now Showing",
-    poster: "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
-  },
-  {
-    id: "2",
-    title: "Interstellar",
-    genre: "Sci-Fi / Drama",
-    rating: "8.7",
-    duration: 169,
-    status: "Now Showing",
-    poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-  },
-  {
-    id: "3",
-    title: "The Batman",
-    genre: "Action / Crime",
-    rating: "7.8",
-    duration: 176,
-    status: "Now Showing",
-    poster: "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
-  },
-  {
-    id: "4",
-    title: "Dune",
-    genre: "Sci-Fi / Adventure",
-    rating: "8.0",
-    duration: 155,
-    status: "Now Showing",
-    poster: "https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg",
-  },
-];
+import api from "../services/api";
 
 export default function Home() {
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await api.get("/movies", {
+          params: {
+            status: "now_showing",
+            limit: 4,
+          },
+        });
+
+        setMovies(response.data.data || []);
+      } catch (err) {
+        setError(
+          err.response?.data?.message ||
+          "Gagal mengambil data film."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovies();
+  }, []);
+
   return (
     <>
+      {/* HERO SECTION */}
       <section className="hero-section">
         <div className="container">
           <div className="hero-content">
@@ -69,6 +64,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* NOW SHOWING SECTION */}
       <section className="container movie-section">
         <div className="section-heading">
           <div>
@@ -81,11 +77,27 @@ export default function Home() {
           </Link>
         </div>
 
+        {loading && (
+          <p className="text-white">Memuat film...</p>
+        )}
+
+        {error && (
+          <div className="alert alert-danger">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && movies.length === 0 && (
+          <p className="text-secondary">
+            Belum ada film yang sedang tayang.
+          </p>
+        )}
+
         <div className="row g-4">
           {movies.map((movie) => (
             <div
               className="col-6 col-md-4 col-lg-3"
-              key={movie.id}
+              key={movie._id}
             >
               <MovieCard movie={movie} />
             </div>

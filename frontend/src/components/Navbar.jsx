@@ -8,7 +8,9 @@ export default function Navbar() {
       <div className="container">
         <Link className="navbar-brand cinema-brand" to="/">
           <Film size={27} />
-          <span>CINO<span className="brand-highlight">VERSE</span></span>
+          <span>
+            CINO<span className="brand-highlight">VERSE</span>
+          </span>
         </Link>
 
         <button
@@ -40,6 +42,13 @@ export default function Navbar() {
             <li className="nav-item">
               <Link className="nav-link" to="/cinemas">
                 Cinemas
+              </Link>
+            </li>
+
+            {/* MENU SHOWTIMES */}
+            <li className="nav-item">
+              <Link className="nav-link" to="/showtimes">
+                Showtimes
               </Link>
             </li>
 

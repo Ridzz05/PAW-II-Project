@@ -1,63 +1,61 @@
 
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Star, Clock, Calendar, ArrowLeft } from "lucide-react";
-
-const movies = [
-  {
-    id: "1",
-    title: "Avengers: Endgame",
-    genre: "Action / Adventure",
-    rating: "8.4",
-    duration: 181,
-    release: "April 26, 2019",
-    poster: "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
-    description:
-      "After the devastating events of Avengers: Infinity War, the universe is in ruins. The Avengers assemble once more to reverse the damage and restore balance to the universe."
-  },
-  {
-    id: "2",
-    title: "Interstellar",
-    genre: "Sci-Fi / Drama",
-    rating: "8.7",
-    duration: 169,
-    release: "November 7, 2014",
-    poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-    description:
-      "A team of explorers travels beyond this galaxy to discover whether mankind has a future among the stars."
-  },
-  {
-    id: "3",
-    title: "The Batman",
-    genre: "Action / Crime",
-    rating: "7.8",
-    duration: 176,
-    release: "March 4, 2022",
-    poster: "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
-    description:
-      "Batman investigates corruption in Gotham City while pursuing a mysterious criminal known as the Riddler."
-  },
-  {
-    id: "4",
-    title: "Dune",
-    genre: "Sci-Fi / Adventure",
-    rating: "8.0",
-    duration: 155,
-    release: "October 22, 2021",
-    poster: "https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg",
-    description:
-      "A young nobleman travels to a dangerous desert planet to secure the future of his family and people."
-  }
-];
+import {
+  Star,
+  Clock,
+  Calendar,
+  ArrowLeft,
+  Film,
+} from "lucide-react";
+import api from "../services/api";
 
 export default function MovieDetail() {
   const { id } = useParams();
 
-  const movie = movies.find((item) => item.id === id);
+  const [movie, setMovie] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  if (!movie) {
+  useEffect(() => {
+    const fetchMovieDetail = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await api.get(`/movies/${id}`);
+
+        setMovie(response.data.data);
+      } catch (err) {
+        setError(
+          err.response?.data?.message ||
+          "Film tidak ditemukan atau gagal mengambil data."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovieDetail();
+  }, [id]);
+
+  if (loading) {
     return (
-      <div className="container py-5 text-center">
+      <div className="container py-5 text-center text-white">
+        Memuat detail film...
+      </div>
+    );
+  }
+
+  if (error || !movie) {
+    return (
+      <div className="container py-5 text-center text-white">
         <h2>Movie Not Found</h2>
+
+        <p className="text-secondary">
+          {error || "Data film tidak tersedia."}
+        </p>
+
         <Link to="/movies" className="btn btn-cinema mt-3">
           Back to Movies
         </Link>
@@ -65,25 +63,33 @@ export default function MovieDetail() {
     );
   }
 
+  const releaseDate = movie.releaseDate
+    ? new Date(movie.releaseDate).toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : "Belum tersedia";
+
   return (
     <div className="container movie-detail-section">
-
       <Link to="/movies" className="back-link">
         <ArrowLeft size={18} /> Back to Movies
       </Link>
 
       <div className="row g-5 mt-3 align-items-center">
-
         <div className="col-md-4">
           <img
-            src={movie.poster}
+            src={
+              movie.posterUrl ||
+              "https://placehold.co/400x600/211936/ffffff?text=No+Poster"
+            }
             alt={movie.title}
             className="detail-poster"
           />
         </div>
 
         <div className="col-md-8">
-
           <span className="section-label">
             MOVIE DETAILS
           </span>
@@ -93,13 +99,15 @@ export default function MovieDetail() {
           </h1>
 
           <p className="detail-genre">
-            {movie.genre}
+            {Array.isArray(movie.genre)
+              ? movie.genre.join(" / ")
+              : movie.genre}
           </p>
 
           <div className="detail-meta">
             <span>
               <Star className="star-icon" size={18} />
-              {movie.rating}
+              {movie.rating ?? 0}/10
             </span>
 
             <span>
@@ -109,23 +117,47 @@ export default function MovieDetail() {
 
             <span>
               <Calendar size={18} />
-              {movie.release}
+              {releaseDate}
+            </span>
+          </div>
+
+          <div className="d-flex flex-wrap gap-2 mt-4">
+            <span className="badge bg-secondary">
+              {movie.ageRating || "13+"}
+            </span>
+
+            <span className="badge bg-secondary">
+              {movie.language || "Indonesia"}
+            </span>
+
+            <span className="badge bg-secondary">
+              {movie.status === "now_showing"
+                ? "Now Showing"
+                : "Coming Soon"}
             </span>
           </div>
 
           <h5 className="mt-5">Synopsis</h5>
 
           <p className="detail-description">
-            {movie.description}
+            {movie.synopsis}
           </p>
 
-          <Link
-            to={`/showtimes/${movie.id}`}
-            className="btn btn-cinema btn-lg mt-3"
-          >
-            Book Ticket Now
-          </Link>
-
+          {movie.status === "now_showing" ? (
+            <Link
+              to={`/showtimes?movieId=${movie._id}`}
+              className="btn btn-cinema btn-lg mt-3"
+            >
+              Book Ticket Now
+            </Link>
+          ) : (
+            <button
+              className="btn btn-secondary btn-lg mt-3"
+              disabled
+            >
+              Coming Soon
+            </button>
+          )}
         </div>
       </div>
     </div>
