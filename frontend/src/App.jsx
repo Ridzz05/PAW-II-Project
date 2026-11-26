@@ -1,5 +1,5 @@
 
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import AdminLayout from "./layouts/AdminLayout";
@@ -24,8 +24,8 @@ import AdminBookings from "./pages/admin/AdminBookings";
 function App() {
   const location = useLocation();
 
-  // Sembunyikan Navbar pada halaman Login, Register, dan Admin
   const hideNavbar =
+    location.pathname === "/" ||
     location.pathname === "/login" ||
     location.pathname === "/register" ||
     location.pathname.startsWith("/admin");
@@ -35,8 +35,11 @@ function App() {
       {!hideNavbar && <Navbar />}
 
       <Routes>
+        {/* HALAMAN AWAL */}
+        <Route path="/" element={<Login />} />
+
         {/* USER */}
-        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/movies/:id" element={<MovieDetail />} />
         <Route path="/cinemas" element={<Cinemas />} />
@@ -56,6 +59,9 @@ function App() {
           <Route path="showtimes" element={<AdminShowtimes />} />
           <Route path="bookings" element={<AdminBookings />} />
         </Route>
+
+        {/* HALAMAN TIDAK DITEMUKAN */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );
