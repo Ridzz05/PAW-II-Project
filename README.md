@@ -2,6 +2,13 @@
 
 Backend API untuk proyek akhir mata kuliah **Pengembangan Aplikasi Web II (PAW II)** — Sistem Pemesanan Tiket Bioskop Secara Online.
 
+## Tautan Penting
+- **Backend API (Vercel):** https://cinoverse-backend.vercel.app/
+- **Repository GitHub:** https://github.com/Ridzz05/PAW-II-Project
+- **Product Requirements Document (PRD):** `docs/PRD.md`
+- **Laporan Progres Backend:** `docs/LAPORAN-BACKEND.md`
+- **Postman Collection:** `postman/Cinoverse-API.postman_collection.json`
+
 ## Kelompok 3 (SI5B — Universitas MDP)
 | No | Nama | NIM | Peran |
 |---:|---|---|---|

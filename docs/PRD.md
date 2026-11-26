@@ -4,7 +4,8 @@
 **Mata Kuliah:** Pengembangan Aplikasi Web II (SI0027)  
 **Kelompok / Kelas:** Kelompok 3 / SI5B — Universitas Multi Data Palembang (MDP)  
 **Dosen Pengampu:** Nur Rachmat, M.Kom.  
-**Repository:** `https://github.com/Ridzz05/PAW-II-Project`
+**Repository:** `https://github.com/Ridzz05/PAW-II-Project`  
+**URL Backend (Vercel):** `https://cinoverse-backend.vercel.app/`
 
 ---
 

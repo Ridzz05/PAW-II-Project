@@ -6,7 +6,8 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "baseUrl", "value": "https://cinoverse-backend.vercel.app" },
+    { "key": "localBaseUrl", "value": "http://localhost:3000" },
     { "key": "token", "value": "" },
     { "key": "userToken", "value": "" },
     { "key": "adminToken", "value": "" },
