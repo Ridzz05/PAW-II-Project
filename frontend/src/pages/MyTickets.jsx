@@ -12,6 +12,7 @@ import {
   CreditCard,
   Printer,
   Building2,
+  XCircle,
 } from "lucide-react";
 import api from "../services/api";
 import "./MyTickets.css";
@@ -23,8 +24,7 @@ const createDecorativeQRValue = (seed) => {
   let number = 0;
 
   for (let i = 0; i < text.length; i++) {
-    number =
-      (number * 31 + text.charCodeAt(i)) >>> 0;
+    number = (number * 31 + text.charCodeAt(i)) >>> 0;
   }
 
   let result = "CINO-";
@@ -41,6 +41,8 @@ export default function MyTickets() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [cancellingId, setCancellingId] = useState(null);
+  const [filterStatus, setFilterStatus] = useState("all");
 
   const navigate = useNavigate();
 
@@ -88,6 +90,33 @@ export default function MyTickets() {
     });
   };
 
+  // Membatalkan pesanan yang belum dibayar.
+  const handleCancelBooking = async (booking) => {
+    const confirmed = window.confirm(
+      `Apakah Anda yakin ingin membatalkan pesanan ${booking.bookingCode || ""}?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setCancellingId(booking._id);
+      setError("");
+
+      await api.put(`/bookings/${booking._id}/cancel`);
+
+      await fetchBookings();
+
+      window.alert("Pesanan berhasil dibatalkan.");
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          "Gagal membatalkan pesanan. Silakan coba lagi."
+      );
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
   // Mencetak hanya tiket yang tombolnya diklik.
   const handlePrint = (bookingId) => {
     const ticketCards = document.querySelectorAll(".ticket-card");
@@ -108,7 +137,6 @@ export default function MyTickets() {
     };
 
     window.addEventListener("afterprint", cleanupPrint);
-
     window.print();
   };
 
@@ -173,6 +201,26 @@ export default function MyTickets() {
     }
   };
 
+  // Menghitung jumlah tiket berdasarkan status.
+  const paidCount = bookings.filter(
+    (booking) => booking.paymentStatus === "paid"
+  ).length;
+
+  const cancelledCount = bookings.filter(
+    (booking) => booking.paymentStatus === "cancelled"
+  ).length;
+
+  const pendingCount = bookings.filter(
+    (booking) => booking.paymentStatus === "pending"
+  ).length;
+
+  // Menyaring riwayat tiket berdasarkan status.
+  const filteredBookings = bookings.filter((booking) => {
+    if (filterStatus === "all") return true;
+
+    return booking.paymentStatus === filterStatus;
+  });
+
   if (loading) {
     return (
       <div className="container py-5 text-center text-white">
@@ -218,6 +266,65 @@ export default function MyTickets() {
         </div>
       )}
 
+      {/* Filter Riwayat Tiket */}
+      {bookings.length > 0 && (
+        <div className="ticket-filter-section mb-4 no-print">
+          <h6 className="text-white fw-semibold mb-3">
+            Filter Riwayat Tiket
+          </h6>
+
+          <div className="d-flex flex-wrap gap-2">
+            <button
+              type="button"
+              className={`btn ${
+                filterStatus === "all"
+                  ? "btn-cinema"
+                  : "btn-outline-light"
+              }`}
+              onClick={() => setFilterStatus("all")}
+            >
+              Semua ({bookings.length})
+            </button>
+
+            <button
+              type="button"
+              className={`btn ${
+                filterStatus === "paid"
+                  ? "btn-cinema"
+                  : "btn-outline-light"
+              }`}
+              onClick={() => setFilterStatus("paid")}
+            >
+              Lunas ({paidCount})
+            </button>
+
+            <button
+              type="button"
+              className={`btn ${
+                filterStatus === "cancelled"
+                  ? "btn-cinema"
+                  : "btn-outline-light"
+              }`}
+              onClick={() => setFilterStatus("cancelled")}
+            >
+              Dibatalkan ({cancelledCount})
+            </button>
+
+            <button
+              type="button"
+              className={`btn ${
+                filterStatus === "pending"
+                  ? "btn-cinema"
+                  : "btn-outline-light"
+              }`}
+              onClick={() => setFilterStatus("pending")}
+            >
+              Menunggu Pembayaran ({pendingCount})
+            </button>
+          </div>
+        </div>
+      )}
+
       {!error && bookings.length === 0 && (
         <div className="card booking-summary-card text-center no-print">
           <div className="card-body py-5">
@@ -245,12 +352,14 @@ export default function MyTickets() {
       )}
 
       <div className="row g-4">
-        {bookings.map((booking) => {
+        {filteredBookings.map((booking) => {
           const showtime = booking.showtimeId;
           const movie = showtime?.movieId;
           const cinema = showtime?.cinemaId;
           const status = getStatus(booking.paymentStatus);
           const isPaid = booking.paymentStatus === "paid";
+          const isPending = booking.paymentStatus === "pending";
+          const isCancelling = cancellingId === booking._id;
 
           const qrValue = createDecorativeQRValue(
             booking._id || booking.bookingCode
@@ -480,7 +589,7 @@ export default function MyTickets() {
                     </>
                   )}
 
-                  {/* Ringkasan pembayaran */}
+                  {/* Ringkasan pembayaran dan aksi */}
                   <hr className="border-secondary" />
 
                   <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -495,24 +604,38 @@ export default function MyTickets() {
                     </div>
 
                     <div className="no-print">
-                      {booking.paymentStatus === "pending" && (
-                        <div className="text-end">
-                          <p className="text-warning small mb-2">
-                            Menunggu proses pembayaran
-                          </p>
-
+                      {isPending && (
+                        <div className="d-flex flex-wrap gap-2">
                           <button
                             type="button"
                             className="btn btn-cinema"
                             onClick={() =>
                               handleContinuePayment(booking)
                             }
+                            disabled={isCancelling}
                           >
                             <CreditCard
                               size={17}
                               className="me-2"
                             />
                             Lanjutkan Pembayaran
+                          </button>
+
+                          <button
+                            type="button"
+                            className="btn btn-outline-danger"
+                            onClick={() =>
+                              handleCancelBooking(booking)
+                            }
+                            disabled={isCancelling}
+                          >
+                            <XCircle
+                              size={17}
+                              className="me-2"
+                            />
+                            {isCancelling
+                              ? "Membatalkan..."
+                              : "Batalkan Pesanan"}
                           </button>
                         </div>
                       )}
@@ -540,6 +663,36 @@ export default function MyTickets() {
             </div>
           );
         })}
+
+        {/* Pesan jika filter tidak menemukan tiket */}
+        {bookings.length > 0 && filteredBookings.length === 0 && (
+          <div className="col-12 no-print">
+            <div className="card booking-summary-card text-center">
+              <div className="card-body py-5">
+                <Ticket
+                  size={42}
+                  className="text-secondary mb-3"
+                />
+
+                <h5 className="text-white">
+                  Tidak Ada Tiket
+                </h5>
+
+                <p className="text-secondary mb-3">
+                  Tidak ada tiket dengan status yang dipilih.
+                </p>
+
+                <button
+                  type="button"
+                  className="btn btn-outline-light"
+                  onClick={() => setFilterStatus("all")}
+                >
+                  Tampilkan Semua Tiket
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

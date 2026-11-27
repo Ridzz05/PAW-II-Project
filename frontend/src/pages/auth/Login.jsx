@@ -64,7 +64,10 @@ export default function Login() {
 
         <Link to="/" className="auth-brand">
           <Film size={30} />
-          CINOVERSE
+          <span>
+            <span style={{ color: "#ffffff" }}>CINO</span>
+            <span style={{ color: "#e50914" }}>VERSE</span>
+          </span>
         </Link>
 
         <h2>Welcome Back!</h2>
@@ -126,7 +129,17 @@ export default function Login() {
           >
             {loading ? "Signing In..." : "Sign In"}
           </button>
-
+          {/* <div className="alert alert-info mt-4 mb-3">
+            <strong>Informasi Akun Admin</strong>
+            <div className="mt-2">
+              <div>
+                Email: <strong>admin@cinoverse.id</strong>
+              </div>
+              <div>
+                Password: <strong>admin123</strong>
+              </div>
+            </div>
+          </div> */}
         </form>
 
         <p className="auth-footer">

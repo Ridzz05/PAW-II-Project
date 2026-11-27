@@ -61,7 +61,10 @@ export default function Register() {
 
         <Link to="/" className="auth-brand">
           <Film size={30} />
-          CINO<span>VERSE</span>
+          <span>
+            <span style={{ color: "#ffffff" }}>CINO</span>
+            <span style={{ color: "#e50914" }}>VERSE</span>
+          </span>
         </Link>
 
         <h2>Create Account</h2>
