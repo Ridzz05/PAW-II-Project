@@ -4,6 +4,7 @@
 ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap');
 
 :root {
   font-family: 'Poppins', sans-serif;
@@ -1499,3 +1500,1012 @@ img {
     padding: 20px 15px;
   }
 }
+
+
+/* =========================================================
+   CINOVERSE - HOME MOVIE HERO
+========================================================= */
+
+.home-hero {
+  position: relative;
+  min-height: 530px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background-color: #09090d;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.home-hero-container {
+  position: relative;
+  min-height: 530px;
+  display: flex;
+  align-items: center;
+}
+
+.home-hero-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 620px;
+  padding: 65px 0 80px;
+}
+
+.home-hero-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 20px;
+}
+
+.home-hero-tag {
+  padding: 6px 12px;
+  background: rgba(229, 9, 20, 0.18);
+  color: #ff626a;
+  border: 1px solid rgba(229, 9, 20, 0.3);
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.home-hero-age {
+  padding-left: 10px;
+  color: #c4c4cc;
+  border-left: 1px solid #777;
+  font-size: 12px;
+}
+
+.home-hero-title {
+  margin-bottom: 18px;
+  color: #ffffff;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(38px, 5vw, 64px);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -1px;
+}
+
+.home-hero-description {
+  max-width: 570px;
+  margin-bottom: 23px;
+  color: #d0d0d7;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.home-hero-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 27px;
+  color: #d0d0d7;
+  font-size: 13px;
+}
+
+.home-hero-meta span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.home-hero-rating {
+  color: #facc15 !important;
+  font-weight: 700;
+}
+
+.home-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.home-btn-primary,
+.home-btn-outline {
+  min-height: 47px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 20px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.home-btn-primary {
+  background: #e50914;
+  color: #ffffff;
+  border: 1px solid #e50914;
+}
+
+.home-btn-primary:hover {
+  background: #b20710;
+  color: #ffffff;
+  border-color: #b20710;
+  transform: translateY(-2px);
+}
+
+.home-btn-outline {
+  background: rgba(10, 10, 15, 0.45);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.home-btn-outline:hover {
+  background: #ffffff;
+  color: #111111;
+}
+
+.home-hero-indicators {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  display: flex;
+  gap: 9px;
+  transform: translateX(-50%);
+}
+
+.home-hero-indicators span {
+  width: 9px;
+  height: 9px;
+  background: #777780;
+  border-radius: 20px;
+}
+
+.home-hero-indicators span.active {
+  width: 23px;
+  background: #e50914;
+}
+
+.home-movie-section {
+  padding-top: 45px;
+}
+
+.home-movie-section .section-heading h2 {
+  color: #ffffff;
+  font-family: 'Playfair Display', serif;
+  font-size: 29px;
+}
+
+.home-movie-section .section-label {
+  color: #ff3944;
+}
+
+.home-movie-section .view-all {
+  color: #ff3944;
+  font-weight: 600;
+}
+
+.home-movie-section .view-all:hover {
+  color: #ffffff;
+}
+
+/* Navbar dan warna tema */
+
+.cinema-navbar {
+  background: #09090d;
+  border-bottom: 1px solid #25252d;
+}
+
+.cinema-brand {
+  color: #ffffff;
+}
+
+.brand-highlight {
+  color: #e50914;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+  color: #ff3944;
+}
+
+.btn-cinema {
+  background: #e50914;
+}
+
+.btn-cinema:hover {
+  background: #b20710;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .home-hero,
+  .home-hero-container {
+    min-height: 470px;
+  }
+
+  .home-hero {
+    background-position: center;
+  }
+
+  .home-hero-content {
+    max-width: 100%;
+    padding: 55px 0 75px;
+  }
+
+  .home-hero-title {
+    font-size: 42px;
+  }
+
+  .home-hero-description {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 576px) {
+  .home-hero,
+  .home-hero-container {
+    min-height: 430px;
+  }
+
+  .home-hero-title {
+    font-size: 34px;
+  }
+
+  .home-hero-meta {
+    gap: 12px;
+    font-size: 11px;
+  }
+
+  .home-btn-primary,
+  .home-btn-outline {
+    padding: 10px 13px;
+    font-size: 11px;
+  }
+
+  .home-movie-section .section-heading h2 {
+    font-size: 22px;
+  }
+}
+
+
+/* HOME HERO CAROUSEL */
+
+.home-hero {
+  transition: background-image 0.5s ease-in-out;
+  animation: heroFade 0.7s ease;
+}
+
+@keyframes heroFade {
+  from {
+    opacity: 0.75;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.home-hero-arrow {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 15, 20, 0.65);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: all 0.25s ease;
+}
+
+.home-hero-arrow:hover {
+  background: #e50914;
+  border-color: #e50914;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.home-hero-prev {
+  left: 20px;
+}
+
+.home-hero-next {
+  right: 20px;
+}
+
+.home-hero-indicators {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  transform: translateX(-50%);
+}
+
+.home-hero-indicators button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  background: #777780;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.home-hero-indicators button.active {
+  width: 25px;
+  background: #e50914;
+}
+
+@media (max-width: 768px) {
+  .home-hero-prev {
+    left: 8px;
+  }
+
+  .home-hero-next {
+    right: 8px;
+  }
+
+  .home-hero-arrow {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+
+/* =========================================================
+   CINOVERSE USER THEME - RED, WHITE & BLACK
+========================================================= */
+
+/* WARNA UTAMA */
+:root {
+  --bg-primary: #090909;
+  --bg-secondary: #111111;
+  --bg-card: #181818;
+  --bg-card-alt: #202020;
+  --bg-input: #151515;
+
+  --primary: #e50914;
+  --primary-dark: #b20710;
+  --primary-light: #ff3944;
+  --accent: #ff3944;
+
+  --text-primary: #ffffff;
+  --text-secondary: #d4d4d4;
+  --text-muted: #a3a3a3;
+
+  --border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* BACKGROUND HALAMAN */
+body {
+  background: #090909;
+  color: #ffffff;
+}
+
+.movie-section,
+.movie-detail-section,
+.booking-page {
+  color: #ffffff;
+}
+
+/* BINGKAI KARTU */
+.movie-card,
+.cinema-card,
+.showtime-card,
+.ticket-card,
+.booking-summary-card,
+.booking-seat-card {
+  background: linear-gradient(145deg, #202020, #111111);
+  color: #ffffff;
+  border: 1px solid rgba(229, 9, 20, 0.3);
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+  transition: all 0.3s ease;
+}
+
+/* EFEK HOVER */
+.movie-card:hover,
+.cinema-card:hover,
+.showtime-card:hover,
+.ticket-card:hover {
+  border-color: #e50914;
+  box-shadow: 0 10px 30px rgba(229, 9, 20, 0.16);
+  transform: translateY(-5px);
+}
+
+/* TULISAN DALAM KARTU */
+.movie-info,
+.movie-info h5,
+.cinema-card .card-title,
+.showtime-card h5,
+.ticket-card h5,
+.ticket-card h4 {
+  color: #ffffff;
+}
+
+.movie-info p,
+.cinema-card p,
+.showtime-card p,
+.ticket-card p {
+  color: #d4d4d4;
+}
+
+/* JUDUL BAGIAN */
+.section-heading h2 {
+  color: #ffffff;
+}
+
+.section-label {
+  color: #ff3944;
+}
+
+.view-all {
+  color: #ff3944;
+}
+
+.view-all:hover {
+  color: #ffffff;
+}
+
+/* PENCARIAN DAN FILTER */
+.movie-search,
+.auth-input {
+  background: #181818;
+  color: #ffffff;
+  border: 1px solid #444444;
+}
+
+.movie-search:focus,
+.auth-input:focus {
+  background: #181818;
+  color: #ffffff;
+  border-color: #e50914;
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.15);
+}
+
+.movie-search::placeholder,
+.auth-input::placeholder {
+  color: #999999;
+}
+
+/* TOMBOL */
+.btn-cinema,
+.home-btn-primary {
+  background: #e50914;
+  color: #ffffff;
+  border: 1px solid #e50914;
+}
+
+.btn-cinema:hover,
+.home-btn-primary:hover {
+  background: #b20710;
+  color: #ffffff;
+  border-color: #b20710;
+}
+
+/* NAVBAR */
+.cinema-navbar {
+  background: #090909;
+  border-bottom: 1px solid #333333;
+}
+
+.cinema-brand {
+  color: #ffffff;
+}
+
+.brand-highlight {
+  color: #e50914;
+}
+
+.navbar-nav .nav-link {
+  color: #dddddd;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+  color: #ff3944;
+}
+
+/* DETAIL FILM */
+.detail-title {
+  color: #ffffff;
+}
+
+.detail-genre {
+  color: #ff3944;
+}
+
+.detail-description,
+.detail-meta {
+  color: #d4d4d4;
+}
+
+/* BIOSKOP */
+.cinema-card-header {
+  background: linear-gradient(135deg, #4a1014, #171717);
+  color: #ff3944;
+}
+
+.studio-item {
+  background: #292929;
+  color: #ffffff;
+}
+
+/* JADWAL TAYANG */
+.showtime-info p {
+  color: #d4d4d4;
+}
+
+.showtime-info svg {
+  color: #ff3944;
+}
+
+.showtime-footer strong {
+  color: #ff555d;
+}
+
+/* MY TICKETS */
+.ticket-status-paid {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+.ticket-status-pending {
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+}
+
+.ticket-status-cancelled {
+  background: rgba(229, 9, 20, 0.15);
+  color: #ff555d;
+}
+
+/* BOOKING DAN KURSI */
+.booking-summary-card,
+.booking-seat-card {
+  padding: 22px;
+}
+
+.screen-line {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #e50914,
+    transparent
+  );
+  box-shadow: 0 5px 20px rgba(229, 9, 20, 0.3);
+}
+
+.seat-button.available,
+.seat-sample.available {
+  background: #303030;
+  color: #ffffff;
+  border-color: #555555;
+}
+
+.seat-button.available:hover {
+  background: #4a4a4a;
+}
+
+.seat-button.selected,
+.seat-sample.selected {
+  background: #e50914;
+  color: #ffffff;
+  border-color: #ff3944;
+}
+
+/* AUTHENTICATION */
+.auth-page {
+  background:
+    radial-gradient(circle at top, #3b1014, transparent 45%),
+    #090909;
+}
+
+.auth-card {
+  background: #171717;
+  border: 1px solid #383838;
+}
+
+.auth-card h2,
+.auth-brand {
+  color: #ffffff;
+}
+
+.auth-brand span,
+.auth-footer a {
+  color: #ff3944;
+}
+
+/* TEKS SEKUNDER */
+.text-secondary {
+  color: #c4c4c4 !important;
+}
+
+/* RESPONSIVE */
+@media (max-width: 576px) {
+  .movie-card,
+  .cinema-card,
+  .showtime-card,
+  .ticket-card {
+    border-radius: 11px;
+  }
+}
+
+
+/* =========================================================
+   LOGIN & REGISTER - RED WHITE BLACK THEME
+========================================================= */
+
+.auth-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(229, 9, 20, 0.16), transparent 45%),
+    #090909;
+}
+
+.auth-card {
+  background: linear-gradient(145deg, #202020, #111111);
+  color: #ffffff;
+  border: 1px solid rgba(229, 9, 20, 0.35);
+  border-radius: 18px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
+}
+
+.auth-brand {
+  color: #ffffff;
+}
+
+.auth-brand span {
+  color: #e50914;
+}
+
+.auth-card h2 {
+  color: #ffffff;
+}
+
+.auth-subtitle {
+  color: #bdbdbd;
+}
+
+.auth-card .form-label {
+  color: #eeeeee;
+}
+
+.auth-input {
+  min-height: 46px;
+  background: #101010;
+  color: #ffffff;
+  border: 1px solid #444444;
+  border-radius: 9px;
+}
+
+.auth-input:focus {
+  background: #101010;
+  color: #ffffff;
+  border-color: #e50914;
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.15);
+}
+
+.auth-input::placeholder {
+  color: #888888;
+}
+
+.password-toggle {
+  color: #cccccc;
+}
+
+.password-toggle:hover {
+  color: #ff3944;
+}
+
+.auth-footer {
+  color: #bbbbbb;
+}
+
+.auth-footer a {
+  color: #ff3944;
+}
+
+.auth-footer a:hover {
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   ADMIN DASHBOARD - RED WHITE BLACK THEME
+========================================================= */
+
+/* Background admin */
+.admin-layout {
+  min-height: 100vh;
+  background: #090909;
+  color: #ffffff;
+}
+
+/* Header admin */
+.admin-topbar {
+  background: #111111;
+  border-bottom: 1px solid rgba(229, 9, 20, 0.35);
+}
+
+.admin-topbar-brand {
+  color: #ffffff;
+}
+
+.admin-topbar-brand .brand-highlight {
+  color: #e50914;
+}
+
+.admin-label {
+  background: rgba(229, 9, 20, 0.15);
+  color: #ff3944;
+  border: 1px solid rgba(229, 9, 20, 0.35);
+}
+
+.admin-welcome {
+  color: #ff3944;
+}
+
+/* Tombol header */
+.admin-topbar-actions .btn {
+  color: #ffffff;
+  border-color: #555555;
+  background: #202020;
+}
+
+.admin-topbar-actions .btn:hover {
+  background: #e50914;
+  border-color: #e50914;
+  color: #ffffff;
+}
+
+/* Judul halaman admin */
+.admin-layout-content {
+  background: #090909;
+  color: #ffffff;
+}
+
+.admin-layout-content h1,
+.admin-layout-content h2,
+.admin-layout-content h3,
+.admin-layout-content h4,
+.admin-layout-content h5 {
+  color: #ffffff;
+}
+
+.admin-layout-content .text-secondary {
+  color: #c4c4c4 !important;
+}
+
+/* Kartu dashboard admin */
+.admin-menu-card {
+  background: linear-gradient(145deg, #202020, #111111);
+  color: #ffffff;
+  border: 1px solid rgba(229, 9, 20, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+}
+
+.admin-menu-card:hover {
+  background: linear-gradient(145deg, #292020, #151515);
+  color: #ffffff;
+  border-color: #e50914;
+  box-shadow: 0 12px 30px rgba(229, 9, 20, 0.17);
+}
+
+.admin-menu-icon {
+  background: rgba(229, 9, 20, 0.15);
+  color: #ff3944;
+  border: 1px solid rgba(229, 9, 20, 0.3);
+}
+
+.admin-menu-card h5 {
+  color: #ffffff;
+}
+
+.admin-menu-card p {
+  color: #c4c4c4;
+}
+
+/* Kartu formulir dan tabel */
+.admin-form-card,
+.admin-table-card,
+.admin-cinema-card,
+.booking-stat-card {
+  background: linear-gradient(145deg, #202020, #111111);
+  color: #ffffff;
+  border: 1px solid rgba(229, 9, 20, 0.25);
+  border-radius: 14px;
+}
+
+.admin-form-card h4,
+.admin-form-card h5,
+.admin-table-card h4,
+.admin-table-card h5 {
+  color: #ffffff;
+}
+
+/* Input admin */
+.admin-form-card .form-control,
+.admin-form-card .form-select,
+.admin-cinema-search .form-control,
+.admin-studio-form .form-control,
+.admin-studio-form .form-select,
+.admin-showtimes-page .form-control,
+.admin-showtimes-page .form-select,
+.admin-movie-toolbar .form-control,
+.admin-booking-toolbar .form-select {
+  background: #151515;
+  color: #ffffff;
+  border: 1px solid #444444;
+}
+
+.admin-form-card .form-control:focus,
+.admin-form-card .form-select:focus,
+.admin-cinema-search .form-control:focus,
+.admin-studio-form .form-control:focus,
+.admin-studio-form .form-select:focus,
+.admin-showtimes-page .form-control:focus,
+.admin-showtimes-page .form-select:focus,
+.admin-movie-toolbar .form-control:focus,
+.admin-booking-toolbar .form-select:focus {
+  background: #151515;
+  color: #ffffff;
+  border-color: #e50914;
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.15);
+}
+
+.admin-form-card .form-label,
+.admin-studio-form .form-label,
+.admin-showtimes-page .form-label {
+  color: #eeeeee;
+}
+
+.admin-form-card .form-control::placeholder {
+  color: #888888;
+}
+
+.admin-form-card .form-select option,
+.admin-studio-form .form-select option,
+.admin-showtimes-page .form-select option {
+  background: #202020;
+  color: #ffffff;
+}
+
+/* Studio */
+.admin-studio-form {
+  background: #151515;
+  border: 1px solid #444444;
+}
+
+.admin-studio-item {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-studio-item strong {
+  color: #ffffff;
+}
+
+.admin-studio-item span {
+  color: #cccccc;
+}
+
+/* Statistik pemesanan */
+.booking-stat-card p {
+  color: #cccccc;
+}
+
+.booking-stat-card h3 {
+  color: #ffffff;
+}
+
+/* Toolbar pemesanan */
+.booking-search-box {
+  background: #151515;
+  color: #ff3944;
+  border-color: #444444;
+}
+
+.booking-search-box:focus-within {
+  border-color: #e50914;
+}
+
+.booking-search-box input {
+  color: #ffffff;
+}
+
+.booking-search-box input::placeholder {
+  color: #999999;
+}
+
+/* Tabel admin */
+.admin-table-card .table,
+.admin-showtimes-page .table,
+.admin-bookings-page .table {
+  --bs-table-bg: transparent;
+  --bs-table-color: #eeeeee;
+  --bs-table-border-color: rgba(255, 255, 255, 0.1);
+  --bs-table-hover-bg: rgba(229, 9, 20, 0.08);
+  --bs-table-hover-color: #ffffff;
+  color: #eeeeee;
+}
+
+.admin-table-card .table thead th,
+.admin-showtimes-page .table thead th,
+.admin-bookings-page .table thead th {
+  background: #202020;
+  color: #ff3944;
+  border-bottom: 1px solid rgba(229, 9, 20, 0.35);
+}
+
+.admin-table-card .table tbody td,
+.admin-showtimes-page .table tbody td,
+.admin-bookings-page .table tbody td {
+  background: transparent;
+  color: #eeeeee;
+}
+
+/* Tombol admin */
+.admin-movies-page .btn-cinema,
+.admin-cinemas-page .btn-cinema,
+.admin-showtimes-page .btn-cinema,
+.admin-bookings-page .btn-cinema {
+  background: #e50914;
+  color: #ffffff;
+  border-color: #e50914;
+}
+
+.admin-movies-page .btn-cinema:hover,
+.admin-cinemas-page .btn-cinema:hover,
+.admin-showtimes-page .btn-cinema:hover,
+.admin-bookings-page .btn-cinema:hover {
+  background: #b20710;
+  color: #ffffff;
+}
+
+/* Empty state */
+.admin-empty-state {
+  background: linear-gradient(145deg, #202020, #111111);
+  color: #cccccc;
+  border: 1px dashed rgba(229, 9, 20, 0.4);
+}
+
+.admin-empty-state h5 {
+  color: #ffffff;
+}
+
+.admin-empty-state p {
+  color: #bbbbbb;
+}
+
+/* Modal admin */
+.admin-booking-modal {
+  background: linear-gradient(145deg, #202020, #111111);
+  color: #ffffff;
+  border: 1px solid rgba(229, 9, 20, 0.35);
+}
+
+.booking-ticket-code {
+  background: rgba(229, 9, 20, 0.1);
+  border-color: #e50914;
+}
+
+.booking-ticket-code span,
+.booking-detail-row span {
+  color: #cccccc;
+}
+
+.booking-detail-total {
+  background: rgba(229, 9, 20, 0.12);
+  border-color: rgba(229, 9, 20, 0.3);
+}
+
+.booking-detail-total span {
+  color: #ff626a;
+}
+

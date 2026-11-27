@@ -5,7 +5,6 @@ import {
   Building2,
   CalendarDays,
   Ticket,
-  Users,
 } from "lucide-react";
 
 const adminMenus = [
@@ -32,7 +31,7 @@ const adminMenus = [
     description: "Lihat dan kelola pemesanan tiket.",
     icon: Ticket,
     path: "/admin/bookings",
-  }
+  },
 ];
 
 function AdminDashboard() {

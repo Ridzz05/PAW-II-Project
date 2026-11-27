@@ -35,6 +35,21 @@ function formatCurrency(value) {
   return `Rp ${Number(value || 0).toLocaleString("id-ID")}`;
 }
 
+function getPaymentMethodLabel(method) {
+  const labels = {
+    virtual_account: "Virtual Account",
+    qris: "QRIS",
+    transfer: "Transfer Bank",
+  };
+
+  if (!method) return "-";
+
+  return (
+    labels[method] ||
+    method.replaceAll("_", " ").toUpperCase()
+  );
+}
+
 function getUserName(booking) {
   const user = booking.userId || booking.user;
 
@@ -76,7 +91,7 @@ function AdminBookings() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-        "Gagal mengambil data pemesanan tiket."
+          "Gagal mengambil data pemesanan tiket."
       );
     } finally {
       setLoading(false);
@@ -91,6 +106,7 @@ function AdminBookings() {
     return bookings.filter((booking) => {
       const movie = getMovie(booking);
       const userName = getUserName(booking);
+
       const bookingCode =
         booking.bookingCode || booking.code || booking._id || "";
 
@@ -144,7 +160,9 @@ function AdminBookings() {
         </button>
       </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && (
+        <div className="alert alert-danger">{error}</div>
+      )}
 
       <div className="row g-3 mb-4">
         <div className="col-md-4">
@@ -158,7 +176,11 @@ function AdminBookings() {
           <div className="booking-stat-card">
             <p>Menunggu Pembayaran</p>
             <h3>
-              {bookings.filter((item) => item.paymentStatus === "pending").length}
+              {
+                bookings.filter(
+                  (item) => item.paymentStatus === "pending"
+                ).length
+              }
             </h3>
           </div>
         </div>
@@ -167,7 +189,11 @@ function AdminBookings() {
           <div className="booking-stat-card">
             <p>Pemesanan Lunas</p>
             <h3>
-              {bookings.filter((item) => item.paymentStatus === "paid").length}
+              {
+                bookings.filter(
+                  (item) => item.paymentStatus === "paid"
+                ).length
+              }
             </h3>
           </div>
         </div>
@@ -176,6 +202,7 @@ function AdminBookings() {
       <div className="admin-booking-toolbar mb-4">
         <div className="booking-search-box">
           <Search size={18} />
+
           <input
             type="text"
             placeholder="Cari kode booking, pengguna, atau film..."
@@ -206,6 +233,7 @@ function AdminBookings() {
                 <th>Film</th>
                 <th>Kursi</th>
                 <th>Total Harga</th>
+                <th>Metode Pembayaran</th>
                 <th>Status</th>
                 <th>Detail</th>
               </tr>
@@ -214,19 +242,20 @@ function AdminBookings() {
             <tbody>
               {loading && bookings.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center py-4">
+                  <td colSpan="8" className="text-center py-4">
                     Memuat data pemesanan...
                   </td>
                 </tr>
               ) : filteredBookings.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center py-4">
+                  <td colSpan="8" className="text-center py-4">
                     Tidak ada data pemesanan yang ditemukan.
                   </td>
                 </tr>
               ) : (
                 filteredBookings.map((booking) => {
                   const movie = getMovie(booking);
+
                   const seats = Array.isArray(booking.seats)
                     ? booking.seats
                     : [];
@@ -241,15 +270,23 @@ function AdminBookings() {
 
                       <td>{getUserName(booking)}</td>
 
-                      <td>{movie.title || "Film tidak ditemukan"}</td>
-
                       <td>
-                        {seats.length
-                          ? seats.join(", ")
-                          : "-"}
+                        {movie.title || "Film tidak ditemukan"}
                       </td>
 
-                      <td>{formatCurrency(booking.totalPrice)}</td>
+                      <td>
+                        {seats.length ? seats.join(", ") : "-"}
+                      </td>
+
+                      <td>
+                        {formatCurrency(booking.totalPrice)}
+                      </td>
+
+                      <td>
+                        {getPaymentMethodLabel(
+                          booking.paymentMethod
+                        )}
+                      </td>
 
                       <td>
                         <span
@@ -293,7 +330,10 @@ function AdminBookings() {
                 <p className="text-secondary mb-1">
                   DETAIL PEMESANAN
                 </p>
-                <h4 className="fw-bold mb-0">E-Ticket Booking</h4>
+
+                <h4 className="fw-bold mb-0">
+                  E-Ticket Booking
+                </h4>
               </div>
 
               <button
@@ -307,6 +347,7 @@ function AdminBookings() {
             {(() => {
               const movie = getMovie(selectedBooking);
               const cinema = getCinema(selectedBooking);
+
               const showtime =
                 selectedBooking.showtimeId ||
                 selectedBooking.showtime ||
@@ -320,6 +361,7 @@ function AdminBookings() {
                 <>
                   <div className="booking-ticket-code mb-4">
                     <span>Kode Booking</span>
+
                     <h5 className="fw-bold mb-0">
                       {selectedBooking.bookingCode ||
                         selectedBooking.code ||
@@ -344,9 +386,7 @@ function AdminBookings() {
 
                   <div className="booking-detail-row">
                     <span>Studio</span>
-                    <strong>
-                      {showtime.studioName || "-"}
-                    </strong>
+                    <strong>{showtime.studioName || "-"}</strong>
                   </div>
 
                   <div className="booking-detail-row">
@@ -354,6 +394,7 @@ function AdminBookings() {
                       <CalendarDays size={15} className="me-1" />
                       Tanggal
                     </span>
+
                     <strong>{showtime.date || "-"}</strong>
                   </div>
 
@@ -367,6 +408,7 @@ function AdminBookings() {
                       <Armchair size={15} className="me-1" />
                       Nomor Kursi
                     </span>
+
                     <strong>{seats.join(", ") || "-"}</strong>
                   </div>
 
@@ -375,24 +417,39 @@ function AdminBookings() {
                       <MapPin size={15} className="me-1" />
                       Kota
                     </span>
+
                     <strong>{cinema.city || "-"}</strong>
                   </div>
 
                   <div className="booking-detail-total mt-3">
                     <span>Total Pembayaran</span>
+
                     <h4 className="fw-bold mb-0">
                       {formatCurrency(selectedBooking.totalPrice)}
                     </h4>
                   </div>
 
                   <div className="booking-detail-row mt-3">
+                    <span>Metode Pembayaran</span>
+
+                    <strong>
+                      {getPaymentMethodLabel(
+                        selectedBooking.paymentMethod
+                      )}
+                    </strong>
+                  </div>
+
+                  <div className="booking-detail-row mt-3">
                     <span>Status</span>
+
                     <span
                       className={`badge ${getStatusClass(
                         selectedBooking.paymentStatus
                       )}`}
                     >
-                      {getStatusLabel(selectedBooking.paymentStatus)}
+                      {getStatusLabel(
+                        selectedBooking.paymentStatus
+                      )}
                     </span>
                   </div>
                 </>

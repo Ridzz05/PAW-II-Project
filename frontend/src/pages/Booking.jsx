@@ -4,13 +4,19 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Armchair, ArrowLeft, Ticket } from "lucide-react";
 import api from "../services/api";
 
+const PAYMENT_METHODS = [
+  { id: "virtual_account", name: "Virtual Account" },
+  { id: "qris", name: "QRIS" },
+  { id: "transfer", name: "Transfer Bank" },
+];
+
 export default function Booking() {
   const { showtimeId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Data yang dikirim dari halaman Riwayat Tiket
   const resumeData = location.state;
+
   const resumeRequested = Boolean(
     resumeData?.continuePayment && resumeData?.bookingId
   );
@@ -26,7 +32,7 @@ export default function Booking() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  // Mengambil jadwal dan booking lama jika melanjutkan pembayaran
+  // Mengambil jadwal dan booking lama
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,14 +40,12 @@ export default function Booking() {
         setError("");
         setPaymentLoadFailed(false);
 
-        // Ambil detail jadwal tayang
         const showtimeResponse = await api.get(
           `/showtimes/${showtimeId}`
         );
 
         setShowtime(showtimeResponse.data.data);
 
-        // Jika berasal dari tombol Lanjutkan Pembayaran
         if (resumeRequested) {
           try {
             const bookingResponse = await api.get(
@@ -54,7 +58,6 @@ export default function Booking() {
               throw new Error("Data booking tidak ditemukan.");
             }
 
-            // Pastikan booking masih menunggu pembayaran
             if (existingBooking.paymentStatus !== "pending") {
               setError(
                 existingBooking.paymentStatus === "paid"
@@ -66,20 +69,14 @@ export default function Booking() {
               return;
             }
 
-            // Pastikan booking sesuai dengan jadwal yang dibuka
             const existingShowtimeId =
               existingBooking.showtimeId?._id ||
               existingBooking.showtimeId;
 
-            if (
-              String(existingShowtimeId) !== String(showtimeId)
-            ) {
-              throw new Error(
-                "Jadwal booking tidak sesuai."
-              );
+            if (String(existingShowtimeId) !== String(showtimeId)) {
+              throw new Error("Jadwal booking tidak sesuai.");
             }
 
-            // Gunakan booking lama, bukan membuat booking baru
             setBooking(existingBooking);
             setSelectedSeats(existingBooking.seats || []);
 
@@ -146,7 +143,6 @@ export default function Booking() {
       maximumFractionDigits: 0,
     }).format(price || 0);
 
-  // Jika booking lama sedang dilanjutkan, gunakan total harga booking tersebut
   const totalPrice = booking
     ? booking.totalPrice
     : selectedSeats.length * (showtime?.price || 0);
@@ -180,11 +176,11 @@ export default function Booking() {
       });
 
       setBooking(response.data.data);
+
       setMessage(
         "Pemesanan berhasil. Silakan lanjutkan pembayaran."
       );
 
-      // Perbarui status kursi dari server
       try {
         const latest = await api.get(
           `/showtimes/${showtimeId}`
@@ -200,7 +196,6 @@ export default function Booking() {
         "Pemesanan gagal. Silakan coba kembali."
       );
 
-      // Perbarui status kursi dari server
       try {
         const latest = await api.get(
           `/showtimes/${showtimeId}`
@@ -235,7 +230,6 @@ export default function Booking() {
         "Pembayaran berhasil! Tiket kamu sudah siap."
       );
 
-      // Arahkan ke halaman riwayat tiket
       navigate("/riwayat");
     } catch (err) {
       setError(
@@ -304,9 +298,7 @@ export default function Booking() {
 
       <div className="card booking-summary-card mb-4">
         <div className="card-body">
-          <h4 className="text-white">
-            {movie?.title}
-          </h4>
+          <h4 className="text-white">{movie?.title}</h4>
 
           <p className="text-secondary mb-1">
             {cinema?.name} - {cinema?.city}
@@ -323,15 +315,11 @@ export default function Booking() {
       </div>
 
       {error && (
-        <div className="alert alert-danger">
-          {error}
-        </div>
+        <div className="alert alert-danger">{error}</div>
       )}
 
       {message && (
-        <div className="alert alert-success">
-          {message}
-        </div>
+        <div className="alert alert-success">{message}</div>
       )}
 
       {paymentLoadFailed && (
@@ -360,7 +348,7 @@ export default function Booking() {
           {!studio || rows <= 0 || cols <= 0 ? (
             <div className="alert alert-warning">
               Informasi kapasitas studio tidak ditemukan.
-              Periksa data studios pada bioskop di MongoDB.
+              Periksa data studios pada MongoDB.
             </div>
           ) : (
             <>
@@ -390,11 +378,8 @@ export default function Booking() {
 
                   <div className="seat-grid">
                     {seats.map((seat) => {
-                      const isBooked =
-                        bookedSeats.includes(seat);
-
-                      const isSelected =
-                        selectedSeats.includes(seat);
+                      const isBooked = bookedSeats.includes(seat);
+                      const isSelected = selectedSeats.includes(seat);
 
                       return (
                         <button
@@ -470,17 +455,11 @@ export default function Booking() {
                     }
                     disabled={Boolean(booking)}
                   >
-                    <option value="virtual_account">
-                      Virtual Account
-                    </option>
-
-                    <option value="qris">
-                      QRIS
-                    </option>
-
-                    <option value="transfer">
-                      Transfer Bank
-                    </option>
+                    {PAYMENT_METHODS.map((method) => (
+                      <option key={method.id} value={method.id}>
+                        {method.name}
+                      </option>
+                    ))}
                   </select>
 
                   {!booking ? (

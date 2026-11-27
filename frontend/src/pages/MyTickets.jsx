@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
 import {
   Ticket,
   CalendarDays,
@@ -9,8 +10,32 @@ import {
   Armchair,
   RefreshCw,
   CreditCard,
+  Printer,
+  Building2,
 } from "lucide-react";
 import api from "../services/api";
+import "./MyTickets.css";
+
+// Membuat QR Code dekoratif yang konsisten untuk setiap tiket.
+const createDecorativeQRValue = (seed) => {
+  const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const text = String(seed || "CINOVERSE");
+  let number = 0;
+
+  for (let i = 0; i < text.length; i++) {
+    number =
+      (number * 31 + text.charCodeAt(i)) >>> 0;
+  }
+
+  let result = "CINO-";
+
+  for (let i = 0; i < 20; i++) {
+    number = (number * 1664525 + 1013904223) >>> 0;
+    result += characters[number % characters.length];
+  }
+
+  return result;
+};
 
 export default function MyTickets() {
   const [bookings, setBookings] = useState([]);
@@ -29,7 +54,7 @@ export default function MyTickets() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-        "Gagal mengambil riwayat tiket."
+          "Gagal mengambil riwayat tiket."
       );
     } finally {
       setLoading(false);
@@ -40,7 +65,7 @@ export default function MyTickets() {
     fetchBookings();
   }, []);
 
-  // Melanjutkan pembayaran dari booking yang sudah dibuat
+  // Melanjutkan pembayaran booking yang masih pending.
   const handleContinuePayment = (booking) => {
     const showtimeId = booking.showtimeId?._id;
 
@@ -63,6 +88,30 @@ export default function MyTickets() {
     });
   };
 
+  // Mencetak hanya tiket yang tombolnya diklik.
+  const handlePrint = (bookingId) => {
+    const ticketCards = document.querySelectorAll(".ticket-card");
+
+    ticketCards.forEach((card) => {
+      card.classList.toggle(
+        "printing-ticket",
+        card.dataset.bookingId === String(bookingId)
+      );
+    });
+
+    const cleanupPrint = () => {
+      ticketCards.forEach((card) => {
+        card.classList.remove("printing-ticket");
+      });
+
+      window.removeEventListener("afterprint", cleanupPrint);
+    };
+
+    window.addEventListener("afterprint", cleanupPrint);
+
+    window.print();
+  };
+
   const formatPrice = (price) =>
     new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -73,14 +122,33 @@ export default function MyTickets() {
   const formatDate = (date) => {
     if (!date) return "-";
 
-    return new Date(`${date}T00:00:00`).toLocaleDateString(
-      "id-ID",
-      {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }
+    const parsedDate = new Date(
+      date.length === 10 ? `${date}T00:00:00` : date
     );
+
+    if (Number.isNaN(parsedDate.getTime())) return "-";
+
+    return parsedDate.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const formatDateTime = (date) => {
+    if (!date) return "-";
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) return "-";
+
+    return parsedDate.toLocaleString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const getStatus = (status) => {
@@ -114,8 +182,8 @@ export default function MyTickets() {
   }
 
   return (
-    <div className="container py-5 booking-page">
-      <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div className="container py-5 booking-page my-tickets-page">
+      <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 no-print">
         <div>
           <span className="section-label">YOUR TICKETS</span>
 
@@ -138,7 +206,7 @@ export default function MyTickets() {
       </div>
 
       {error && (
-        <div className="alert alert-danger">
+        <div className="alert alert-danger no-print">
           {error}
 
           <button
@@ -151,7 +219,7 @@ export default function MyTickets() {
       )}
 
       {!error && bookings.length === 0 && (
-        <div className="card booking-summary-card text-center">
+        <div className="card booking-summary-card text-center no-print">
           <div className="card-body py-5">
             <Ticket
               size={48}
@@ -182,24 +250,43 @@ export default function MyTickets() {
           const movie = showtime?.movieId;
           const cinema = showtime?.cinemaId;
           const status = getStatus(booking.paymentStatus);
+          const isPaid = booking.paymentStatus === "paid";
+
+          const qrValue = createDecorativeQRValue(
+            booking._id || booking.bookingCode
+          );
 
           return (
             <div className="col-12" key={booking._id}>
-              <div className="card booking-summary-card ticket-card">
+              <div
+                className="card booking-summary-card ticket-card"
+                data-booking-id={booking._id}
+              >
                 <div className="card-body p-4">
-                  <div className="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
-                    <div>
-                      <span className="section-label">
-                        CINOVERSE E-TICKET
-                      </span>
+                  {/* Bagian utama tiket */}
+                  <div className="ticket-header d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+                    <div className="d-flex align-items-center gap-3">
+                      {movie?.posterUrl && (
+                        <img
+                          src={movie.posterUrl}
+                          alt={movie?.title || "Poster film"}
+                          className="ticket-poster"
+                        />
+                      )}
 
-                      <h4 className="text-white mt-2 mb-1">
-                        {movie?.title || "Film tidak tersedia"}
-                      </h4>
+                      <div>
+                        <span className="section-label">
+                          CINOVERSE E-TICKET
+                        </span>
 
-                      <small className="text-secondary">
-                        Kode Booking: {booking.bookingCode}
-                      </small>
+                        <h4 className="text-white mt-2 mb-1">
+                          {movie?.title || "Film tidak tersedia"}
+                        </h4>
+
+                        <small className="text-secondary">
+                          Kode Booking: {booking.bookingCode || "-"}
+                        </small>
+                      </div>
                     </div>
 
                     <span
@@ -211,27 +298,28 @@ export default function MyTickets() {
 
                   <hr className="border-secondary" />
 
-                  <div className="row g-3">
+                  {/* Informasi jadwal */}
+                  <div className="row g-4 ticket-main-info">
                     <div className="col-md-6">
-                      <p className="text-secondary mb-1">
-                        <MapPin size={15} className="me-2" />
+                      <p className="ticket-info-label">
+                        <MapPin size={16} />
                         Bioskop
                       </p>
 
-                      <p className="text-white mb-0">
+                      <p className="text-white mb-1">
                         {cinema?.name || "-"}
                         {cinema?.city ? ` - ${cinema.city}` : ""}
                       </p>
 
                       <small className="text-secondary">
-                        {cinema?.address || ""}
+                        {cinema?.address || "-"}
                       </small>
                     </div>
 
                     <div className="col-md-6">
-                      <p className="text-secondary mb-1">
-                        <CalendarDays size={15} className="me-2" />
-                        Tanggal
+                      <p className="ticket-info-label">
+                        <CalendarDays size={16} />
+                        Tanggal Tayang
                       </p>
 
                       <p className="text-white mb-0">
@@ -240,9 +328,9 @@ export default function MyTickets() {
                     </div>
 
                     <div className="col-md-6">
-                      <p className="text-secondary mb-1">
-                        <Clock size={15} className="me-2" />
-                        Waktu
+                      <p className="ticket-info-label">
+                        <Clock size={16} />
+                        Waktu Tayang
                       </p>
 
                       <p className="text-white mb-0">
@@ -251,8 +339,8 @@ export default function MyTickets() {
                     </div>
 
                     <div className="col-md-6">
-                      <p className="text-secondary mb-1">
-                        <Armchair size={15} className="me-2" />
+                      <p className="ticket-info-label">
+                        <Building2 size={16} />
                         Studio
                       </p>
 
@@ -265,8 +353,9 @@ export default function MyTickets() {
                     </div>
 
                     <div className="col-md-6">
-                      <p className="text-secondary mb-1">
-                        Kursi
+                      <p className="ticket-info-label">
+                        <Armchair size={16} />
+                        Nomor Kursi
                       </p>
 
                       <p className="text-white mb-0">
@@ -275,16 +364,123 @@ export default function MyTickets() {
                     </div>
 
                     <div className="col-md-6">
-                      <p className="text-secondary mb-1">
-                        Metode Pembayaran
+                      <p className="ticket-info-label">
+                        <Ticket size={16} />
+                        Jumlah Tiket
                       </p>
 
                       <p className="text-white mb-0">
-                        {booking.paymentMethod || "-"}
+                        {booking.seats?.length || 0} Tiket
                       </p>
                     </div>
                   </div>
 
+                  {/* QR Code dekoratif hanya untuk tiket lunas */}
+                  {isPaid && (
+                    <>
+                      <div className="ticket-qr-section">
+                        <div className="ticket-qr-box">
+                          <QRCodeSVG
+                            value={qrValue}
+                            size={150}
+                            level="M"
+                            bgColor="#ffffff"
+                            fgColor="#111111"
+                          />
+                        </div>
+
+                        <p className="text-white fw-semibold mt-3 mb-1">
+                          CINOVERSE DIGITAL TICKET
+                        </p>
+
+                        <small className="text-secondary">
+                          QR Code dekoratif
+                        </small>
+                      </div>
+
+                      <div className="ticket-detail-section">
+                        <div className="ticket-detail-heading">
+                          DETAIL PEMESANAN
+                        </div>
+
+                        <div className="row g-3">
+                          <div className="col-sm-6">
+                            <small className="text-secondary">
+                              Kode Booking
+                            </small>
+                            <p className="text-white mb-0">
+                              {booking.bookingCode || "-"}
+                            </p>
+                          </div>
+
+                          <div className="col-sm-6">
+                            <small className="text-secondary">
+                              Film
+                            </small>
+                            <p className="text-white mb-0">
+                              {movie?.title || "-"}
+                            </p>
+                          </div>
+
+                          <div className="col-sm-6">
+                            <small className="text-secondary">
+                              Bioskop
+                            </small>
+                            <p className="text-white mb-0">
+                              {cinema?.name || "-"}
+                            </p>
+                          </div>
+
+                          <div className="col-sm-6">
+                            <small className="text-secondary">
+                              Alamat Bioskop
+                            </small>
+                            <p className="text-white mb-0">
+                              {cinema?.address || "-"}
+                            </p>
+                          </div>
+
+                          <div className="col-sm-6">
+                            <small className="text-secondary">
+                              Metode Pembayaran
+                            </small>
+                            <p className="text-white mb-0">
+                              {booking.paymentMethod || "-"}
+                            </p>
+                          </div>
+
+                          <div className="col-sm-6">
+                            <small className="text-secondary">
+                              Tanggal Pembayaran
+                            </small>
+                            <p className="text-white mb-0">
+                              {formatDateTime(booking.paidAt)}
+                            </p>
+                          </div>
+
+                          <div className="col-sm-6">
+                            <small className="text-secondary">
+                              Status Pembayaran
+                            </small>
+                            <p className="text-success mb-0">
+                              Lunas
+                            </p>
+                          </div>
+
+                          <div className="col-sm-6">
+                            <small className="text-secondary">
+                              Total Pembayaran
+                            </small>
+                            <p className="text-white fw-bold mb-0">
+                              {formatPrice(booking.totalPrice)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Ringkasan pembayaran */}
                   <hr className="border-secondary" />
 
                   <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -298,40 +494,46 @@ export default function MyTickets() {
                       </h4>
                     </div>
 
-                    {booking.paymentStatus === "pending" && (
-                      <div className="text-end">
-                        <p className="text-warning small mb-2">
-                          Menunggu proses pembayaran
-                        </p>
+                    <div className="no-print">
+                      {booking.paymentStatus === "pending" && (
+                        <div className="text-end">
+                          <p className="text-warning small mb-2">
+                            Menunggu proses pembayaran
+                          </p>
 
+                          <button
+                            type="button"
+                            className="btn btn-cinema"
+                            onClick={() =>
+                              handleContinuePayment(booking)
+                            }
+                          >
+                            <CreditCard
+                              size={17}
+                              className="me-2"
+                            />
+                            Lanjutkan Pembayaran
+                          </button>
+                        </div>
+                      )}
+
+                      {isPaid && (
                         <button
                           type="button"
-                          className="btn btn-cinema"
-                          onClick={() =>
-                            handleContinuePayment(booking)
-                          }
+                          className="btn btn-outline-light"
+                          onClick={() => handlePrint(booking._id)}
                         >
-                          <CreditCard
-                            size={17}
-                            className="me-2"
-                          />
-                          Lanjutkan Pembayaran
+                          <Printer size={17} className="me-2" />
+                          Cetak Tiket
                         </button>
-                      </div>
-                    )}
+                      )}
 
-                    {booking.paymentStatus === "paid" && (
-                      <span className="text-success small">
-                        <Ticket size={16} className="me-1" />
-                        Pembayaran berhasil
-                      </span>
-                    )}
-
-                    {booking.paymentStatus === "cancelled" && (
-                      <span className="text-danger small">
-                        Pemesanan telah dibatalkan
-                      </span>
-                    )}
+                      {booking.paymentStatus === "cancelled" && (
+                        <span className="text-danger small">
+                          Pemesanan telah dibatalkan
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
