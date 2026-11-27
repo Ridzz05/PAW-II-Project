@@ -64,7 +64,7 @@ export default function Login() {
 
         <Link to="/" className="auth-brand">
           <Film size={30} />
-          CINO<span>VERSE</span>
+          CINOVERSE
         </Link>
 
         <h2>Welcome Back!</h2>

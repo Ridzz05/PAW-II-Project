@@ -32,13 +32,7 @@ const adminMenus = [
     description: "Lihat dan kelola pemesanan tiket.",
     icon: Ticket,
     path: "/admin/bookings",
-  },
-  {
-    title: "Kelola Pengguna",
-    description: "Lihat data pengguna CINOVERSE.",
-    icon: Users,
-    path: "/admin/users",
-  },
+  }
 ];
 
 function AdminDashboard() {
